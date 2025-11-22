@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Probador de API - Sistema de Ventas</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 1200px; margin: 0 auto; padding: 20px; background-color: #f5f5f5; }
+        h1 { color: #2c3e50; text-align: center; }
+        .container { display: flex; gap: 20px; flex-wrap: wrap; }
+        .card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); flex: 1; min-width: 300px; margin-bottom: 20px; }
+        h2 { color: #3498db; border-bottom: 2px solid #ecf0f1; padding-bottom: 10px; }
+        button { background-color: #2ecc71; color: white; border: none; padding: 10px 15px; border-radius: 4px; cursor: pointer; font-weight: bold; margin-top: 10px; }
+        button:hover { background-color: #27ae60; }
+        button.get { background-color: #3498db; }
+        button.get:hover { background-color: #2980b9; }
+        input, select { width: 100%; padding: 8px; margin: 5px 0; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; }
+        label { font-weight: bold; font-size: 0.9em; color: #7f8c8d; }
+        pre { background: #2c3e50; color: #ecf0f1; padding: 15px; border-radius: 4px; overflow-x: auto; max-height: 300px; }
+        .response-area { margin-top: 20px; }
+        .status { font-weight: bold; margin-bottom: 5px; }
+        .success { color: #27ae60; }
+        .error { color: #e74c3c; }
+    </style>
+</head>
+<body>
+    <h1>🚀 Probador de API - Sistema de Ventas</h1>
+    
+    <div class="container">
+        <!-- Categorías -->
+        <div class="card">
+            <h2>Categorías</h2>
+            <button class="get" onclick="getData('categorias')">Listar Categorías</button>
+            <hr>
+            <h3>Crear Nueva</h3>
+            <label>Nombre:</label>
+            <input type="text" id="cat-nombre" placeholder="Ej. Electrónica">
+            <button onclick="postData('categorias', {nombre: getValue('cat-nombre')})">Crear Categoría</button>
+        </div>
+
+        <!-- Marcas -->
+        <div class="card">
+            <h2>Marcas</h2>
+            <button class="get" onclick="getData('marcas')">Listar Marcas</button>
+            <hr>
+            <h3>Crear Nueva</h3>
+            <label>Nombre:</label>
+            <input type="text" id="marca-nombre" placeholder="Ej. Samsung">
+            <label>Descripción:</label>
+            <input type="text" id="marca-desc" placeholder="Ej. Productos electrónicos">
+            <button onclick="postData('marcas', {nombre: getValue('marca-nombre'), descripcion: getValue('marca-desc')})">Crear Marca</button>
+        </div>
+
+        <!-- Clientes -->
+        <div class="card">
+            <h2>Clientes</h2>
+            <button class="get" onclick="getData('clientes')">Listar Clientes</button>
+            <hr>
+            <h3>Crear Nuevo</h3>
+            <label>Nombre:</label>
+            <input type="text" id="cli-nombre" placeholder="Nombre">
+            <label>Apellidos:</label>
+            <input type="text" id="cli-apellidos" placeholder="Apellidos">
+            <label>DNI/RUC:</label>
+            <input type="text" id="cli-doc" placeholder="Documento">
+            <label>Celular:</label>
+            <input type="text" id="cli-cel" placeholder="Celular">
+            <button onclick="createCliente()">Crear Cliente</button>
+        </div>
+    </div>
+
+    <div class="response-area">
+        <h2>Resultado</h2>
+        <div id="status" class="status"></div>
+        <pre id="output">Esperando acción...</pre>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:8080/api';
+
+        function getValue(id) {
+            return document.getElementById(id).value;
+        }
+
+        async function getData(endpoint) {
+            showLoading();
+            try {
+                const response = await fetch(`${API_URL}/${endpoint}`);
+                const data = await response.json();
+                showResult(response.status, data);
+            } catch (error) {
+                showError(error);
+            }
+        }
+
+        async function postData(endpoint, data) {
+            showLoading();
+            try {
+                const response = await fetch(`${API_URL}/${endpoint}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                const result = await response.json();
+                showResult(response.status, result);
+            } catch (error) {
+                showError(error);
+            }
+        }
+
+        function createCliente() {
+            const data = {
+                nombre: getValue('cli-nombre'),
+                apellidos: getValue('cli-apellidos'),
+                nroDocumento: getValue('cli-doc'),
+                direccion: "Dirección de prueba",
+                celular: getValue('cli-cel'),
+                estado: true
+                // idTipoCliente y idTipoDocumento se asignan por defecto en el backend
+            };
+            postData('clientes', data);
+        }
+
+        function showLoading() {
+            document.getElementById('output').textContent = "Cargando...";
+            document.getElementById('status').textContent = "";
+        }
+
+        function showResult(status, data) {
+            const statusEl = document.getElementById('status');
+            statusEl.textContent = `Status: ${status}`;
+            statusEl.className = status >= 200 && status < 300 ? 'status success' : 'status error';
+            document.getElementById('output').textContent = JSON.stringify(data, null, 2);
+        }
+
+        function showError(error) {
+            document.getElementById('status').textContent = "Error de conexión";
+            document.getElementById('status').className = 'status error';
+            document.getElementById('output').textContent = `Error: ${error.message}\n\nAsegúrate de que el backend esté corriendo en el puerto 8080.`;
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,8 @@
+InvalidOperation: C:\Users\Henyer\Downloads\backend\backend\test-post-detailed.ps1:51:5
+Line |
+  51 |      $reader = New-Object System.IO.StreamReader($_.Exception.Response …
+     |      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     | Method invocation
+     | failed because
+     | [System.Net.Http.HttpResponseMessage] does not contain a method named 'GetResponseStream'.
+
