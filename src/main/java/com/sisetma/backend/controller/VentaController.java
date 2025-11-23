@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/ventas")
@@ -14,6 +15,11 @@ import org.springframework.web.bind.annotation.*;
 public class VentaController {
 
     private final VentaService ventaService;
+
+    @GetMapping
+    public ResponseEntity<List<Comprobante>> listarVentas() {
+        return ResponseEntity.ok(ventaService.listarVentas());
+    }
 
     @PostMapping
     public ResponseEntity<?> registrarVenta(@RequestBody VentaDTO ventaDto) {

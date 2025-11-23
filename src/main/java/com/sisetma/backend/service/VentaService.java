@@ -100,4 +100,8 @@ public class VentaService {
 
         return comprobanteRepository.save(venta);
     }
+
+    public List<Comprobante> listarVentas() {
+        return comprobanteRepository.findAll();
+    }
 }
